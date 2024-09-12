@@ -29,6 +29,8 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
     final updatedTodos = List<Map<String, dynamic>>.from(state.todos)
       ..add(newTodo);
 
+    updatedTodos.sort((a, b) => a['completed'] ? 1 : -1);
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setStringList(
         'todos', updatedTodos.map((e) => e['task'].toString()).toList());
@@ -41,8 +43,11 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
   Future<void> _onToggleTodo(ToggleTodo event, Emitter<TodoState> emit) async {
     final updatedTodos = List<Map<String, dynamic>>.from(state.todos);
     final todo = updatedTodos.removeAt(event.index);
+
     todo['completed'] = !todo['completed'];
+
     updatedTodos.add(todo);
+    updatedTodos.sort((a, b) => a['completed'] ? 1 : -1);
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setStringList(
